@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827"><title>BINGX SMART TRADER</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#131e30;--muted:#91a0b7;--line:#26344a;--green:#21c58e;--red:#ff647c;--blue:#69a9ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#edf3fc;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:18px 16px 12px;background:#101827;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+h1{font-size:19px;margin:0 0 5px;letter-spacing:.3px}.sub{font-size:12px;color:var(--muted)}
+main{max-width:760px;margin:auto;padding:14px;display:grid;gap:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px}
+.k{color:var(--muted);font-size:12px}.v{font-size:22px;font-weight:750;margin-top:5px}.green{color:var(--green)}.red{color:var(--red)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row + .row{margin-top:10px}
+button,select{background:#23334b;color:#fff;border:1px solid #344864;border-radius:11px;padding:11px 13px;font-weight:650;font-size:14px}
+button:disabled{opacity:.45}.primary{background:#126b53;border-color:#168767}.danger{background:#642b3a;border-color:#9c4056}.wide{width:100%}
+.pill{border-radius:99px;padding:4px 9px;font-size:11px;background:#24344a;color:#b8c8df}.on{background:#104b3c;color:#73f0c1}.warn{color:#ffd27c}
+.section{font-weight:750;margin-bottom:10px}.muted{color:var(--muted);font-size:12px;line-height:1.5}
+.asset{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.asset:last-child{border:0}
+.asset small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+input{width:75px;background:#0c1626;border:1px solid var(--line);border-radius:8px;color:white;padding:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.log{max-height:150px;overflow:auto;font-size:12px;color:var(--muted);line-height:1.6}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:8px 20px 25px}
+@media(min-width:600px){main{padding:20px}.v{font-size:25px}}
+</style>
+</head>
+<body>
+<header><div class="row"><div><h1>BINGX SMART TRADER</h1><div class="sub">BOT mô phỏng · Giao diện tiếng Việt</div></div><span class="pill on">CHỈ DEMO</span></div></header>
+<main>
+ <div class="grid">
+  <div class="card"><div class="k">Số dư khả dụng</div><div class="v" id="balance">1.000,00</div><div class="k">USDT ảo</div></div>
+  <div class="card"><div class="k">Lãi / lỗ đã + đang</div><div class="v" id="pnl">0,00</div><div class="k">USDT ảo</div></div>
+  <div class="card"><div class="k">Vốn đã sử dụng</div><div class="v" id="used">0,00</div><div class="k">USDT ảo</div></div>
+  <div class="card"><div class="k">Lệnh đang mở</div><div class="v" id="openCount">0 / 5</div><div class="k">Tối đa 5 vị thế</div></div>
+ </div>
+ <section class="card">
+  <div class="row"><div><div class="section">Điều khiển BOT</div><div class="muted">Tự quét tín hiệu mỗi 60 giây</div></div><span id="botStatus" class="pill">ĐANG TẮT</span></div>
+  <div class="row" style="margin-top:14px"><button id="toggleBot" class="primary" style="flex:1">BẬT BOT DEMO</button><button id="stopAll" class="danger">Đóng tất cả</button></div>
+  <div class="muted" style="margin-top:9px">Dừng BOT không tự đóng vị thế. Dùng “Đóng tất cả” nếu muốn kết thúc mọi lệnh mô phỏng.</div>
+ </section>
+ <section class="card">
+  <div class="section">Cấu hình rủi ro</div>
+  <div class="row"><span class="muted">Vốn khởi tạo</span><b>1.000 USDT</b></div>
+  <div class="row"><span class="muted">Ký quỹ mỗi lệnh</span><b>100 USDT</b></div>
+  <div class="row"><span class="muted">Đòn bẩy mô phỏng</span><b>3x</b></div>
+  <div class="row"><span class="muted">Chốt lời / cắt lỗ</span><b class="green">+3% / <span class="red">-1%</span></b></div>
+  <div class="row"><span class="muted">Giới hạn lỗ ngày</span><b>30 USDT</b></div>
+  <div class="row"><span class="muted">Quét tín hiệu</span><b>60 giây</b></div>
+  <div class="row"><span class="muted">Làm mới giá</span><b>5 giây</b></div>
+  <div class="muted" style="margin-top:10px">TP/SL tính trên ký quỹ mô phỏng, chưa tính phí giao dịch và trượt giá. Khi chạm giới hạn lỗ ngày, BOT ngừng mở lệnh mới.</div>
+ </section>
+ <section class="card"><div class="row"><div class="section">Thị trường theo dõi</div><span id="feed" class="pill">Đang kết nối…</span></div><div id="assets"></div></section>
+ <section class="card"><div class="section">Vị thế mô phỏng</div><div id="positions" class="muted">Chưa có vị thế.</div></section>
+ <section class="card"><div class="section">Lịch sử giao dịch</div><div id="history" class="muted">Chưa có giao dịch.</div></section>
+ <section class="card"><div class="section">Nhật ký BOT</div><div id="logs" class="log">Ứng dụng khởi tạo. Chưa có lệnh nào được gửi lên BingX.</div></section>
+ <div class="muted">Chiến lược Cân bằng: EMA 9/21 xác định xu hướng; RSI 14 lọc vùng động lượng; MACD 12/26/9 xác nhận; ATR 14 dùng tham khảo biến động. Chỉ giao dịch khi các điều kiện đồng thuận.</div>
+</main>
+<footer>Phiên bản thử nghiệm trên điện thoại · Chỉ mô phỏng bằng USDT ảo · Không kết nối tài khoản hoặc đặt lệnh thật.</footer>
+<script>
+const API='https://open-api.bingx.com';
+const SYMBOLS=['BTC-USDT','ETH-USDT','BNB-USDT','SOL-USDT','XRP-USDT'];
+const $=id=>document.getElementById(id);
+let state=load()||{balance:1000,realized:0,positions:[],history:[],bot:false,dayLoss:0,day:new Date().toDateString()};
+let prices={},indicators={},busy=false,lastScan=0,logs=[];
+function load(){try{return JSON.parse(localStorage.getItem('bst_demo_v1'))}catch(e){return null}}
+function save(){localStorage.setItem('bst_demo_v1',JSON.stringify(state))}
+function num(x,d=2){return Number(x).toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function log(s){logs.unshift(new Date().toLocaleTimeString('vi-VN')+' · '+s);logs=logs.slice(0,35);$('logs').innerHTML=logs.map(x=>'<div>'+x+'</div>').join('')}
+async function get(path){const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();if(j.code!==undefined&&j.code!==0)throw Error(j.msg||'API BingX lỗi');return j.data}
+function rows(data){if(Array.isArray(data))return data;if(data&&Array.isArray(data.data))return data.data;return []}
+async function ticker(sym){const d=await get('/openApi/swap/v2/quote/ticker?symbol='+sym);return Number(d.lastPrice||d.price||d.close)}
+async function candles(sym){const d=await get('/openApi/swap/v3/quote/klines?symbol='+sym+'&interval=1m&limit=100');return rows(d).map(x=>({c:Number(Array.isArray(x)?x[4]:x.close),h:Number(Array.isArray(x)?x[2]:x.high),l:Number(Array.isArray(x)?x[3]:x.low)})).filter(x=>x.c>0)}
+function ema(a,p){let k=2/(p+1),v=a[0];for(let i=1;i<a.length;i++)v=a[i]*k+v*(1-k);return v}
+function rsi(a,p=14){let up=0,dn=0;for(let i=a.length-p;i<a.length;i++){let z=a[i]-a[i-1];if(z>0)up+=z;else dn-=z}if(!dn)return 100;let rs=(up/p)/(dn/p);return 100-100/(1+rs)}
+function macd(a){let fast=emaSeries(a,12),slow=emaSeries(a,26),line=a.map((_,i)=>fast[i]-slow[i]),sig=emaSeries(line.slice(-35),9);return line[line.length-1]-sig[sig.length-1]}
+function emaSeries(a,p){let k=2/(p+1),o=[a[0]];for(let i=1;i<a.length;i++)o.push(a[i]*k+o[i-1]*(1-k));return o}
+function calc(c){let a=c.map(x=>x.c);return {e9:ema(a.slice(-60),9),e21:ema(a.slice(-80),21),r:rsi(a),m:macd(a),atr:c.slice(-15).reduce((s,x)=>s+x.h-x.l,0)/15}}
+function signal(v){if(v.e9>v.e21&&v.r>=52&&v.r<=68&&v.m>0)return 'LONG';if(v.e9<v.e21&&v.r>=32&&v.r<=48&&v.m<0)return 'SHORT';return 'CHỜ'}
+async function refreshPrices(){try{await Promise.all(SYMBOLS.map(async s=>{let p=await ticker(s);if(p>0)prices[s]=p}));$('feed').textContent='Dữ liệu BingX trực tiếp';$('feed').className='pill on';updatePositions();render()}catch(e){$('feed').textContent='Mất kết nối dữ liệu';$('feed').className='pill';log('Không lấy được giá: '+e.message)}}
+async function scan(){if(busy||!state.bot)return;busy=true;try{
+ if(state.day!==new Date().toDateString()){state.day=new Date().toDateString();state.dayLoss=0}
+ if(state.dayLoss>=30){state.bot=false;log('Đạt giới hạn lỗ ngày 30 USDT: BOT tự dừng.');save();render();return}
+ for(const s of SYMBOLS){if(state.positions.length>=5)break;if(state.positions.some(p=>p.symbol===s))continue;
+ try{const c=await candles(s);if(c.length<60)continue;let v=calc(c);indicators[s]=v;let sig=signal(v);if(sig!=='CHỜ'&&prices[s])openPosition(s,sig,prices[s],v)}
+ catch(e){log(s+' không phân tích được: '+e.message)}
+ }
+ }finally{busy=false;lastScan=Date.now();render()}}
+function openPosition(symbol,side,price,v){const margin=100;if(state.balance<margin)return;const p={id:Date.now()+Math.random(),symbol,side,entry:price,price,margin,notional:margin*3,opened:new Date().toISOString(),rsi:v.r,ema9:v.e9,ema21:v.e21};state.balance-=margin;state.positions.push(p);log('Mở '+side+' '+symbol+' tại '+num(price,4)+' (mô phỏng).');save()}
+function updatePositions(){let changed=false;for(const p of [...state.positions]){let price=prices[p.symbol];if(!price)continue;p.price=price;let pnl=(p.side==='LONG'?price-p.entry:p.entry-price)/p.entry*p.notional;let roi=pnl/p.margin*100;if(roi>=3||roi<=-1){closePosition(p,roi>=3?'Chốt lời':'Cắt lỗ',pnl);changed=true}}if(changed)save()}
+function closePosition(p,why,pnlOverride){let pnl=pnlOverride??(p.side==='LONG'?p.price-p.entry:p.entry-p.price)/p.entry*p.notional;state.balance+=p.margin+pnl;state.realized+=pnl;if(pnl<0)state.dayLoss+=-pnl;state.positions=state.positions.filter(x=>x.id!==p.id);state.history.unshift({symbol:p.symbol,side:p.side,pnl,why,time:new Date().toLocaleString('vi-VN')});state.history=state.history.slice(0,40);log(why+' '+p.symbol+': '+(pnl>=0?'+':'')+num(pnl)+' USDT ảo.');save();render()}
+function render(){
+ const floating=state.positions.reduce((s,p)=>s+(p.side==='LONG'?p.price-p.entry:p.entry-p.price)/p.entry*p.notional,0);
+ $('balance').textContent=num(state.balance);$('pnl').textContent=(state.realized+floating>=0?'+':'')+num(state.realized+floating);$('pnl').className='v '+(state.realized+floating>=0?'green':'red');
+ $('used').textContent=num(state.positions.reduce((s,p)=>s+p.margin,0));$('openCount').textContent=state.positions.length+' / 5';
+ $('botStatus').textContent=state.bot?'ĐANG CHẠY':'ĐANG TẮT';$('botStatus').className='pill '+(state.bot?'on':'');$('toggleBot').textContent=state.bot?'TẮT BOT':'BẬT BOT DEMO';
+ $('assets').innerHTML=SYMBOLS.map(s=>{let v=indicators[s],p=prices[s];return `<div class="asset"><div><b>${s}</b><small>${v?'EMA '+(v.e9>v.e21?'tăng':'giảm')+' · RSI '+num(v.r,1)+' · MACD '+(v.m>0?'dương':'âm'):'Chưa phân tích'}</small></div><div style="text-align:right"><b>${p?num(p,p>100?2:4):'—'}</b><small>${v?signal(v):'Đang chờ'}</small></div><span class="pill">${p?'LIVE':'—'}</span></div>`}).join('');
+ $('positions').innerHTML=state.positions.length?`<table><tr><th>Cặp / Hướng</th><th>Giá vào</th><th>Lãi/lỗ</th><th></th></tr>`+state.positions.map(p=>{let z=(p.side==='LONG'?p.price-p.entry:p.entry-p.price)/p.entry*p.notional;return `<tr><td>${p.symbol}<br><small>${p.side}</small></td><td>${num(p.entry,p.entry>100?2:4)}</td><td class="${z>=0?'green':'red'}">${z>=0?'+':''}${num(z)}</td><td><button data-close="${p.id}">Đóng</button></td></tr>`}).join('')+'</table>':'Chưa có vị thế.';
+ $('history').innerHTML=state.history.length?'<table><tr><th>Thời gian</th><th>Lệnh</th><th>Kết quả</th></tr>'+state.history.map(h=>`<tr><td>${h.time}</td><td>${h.symbol} ${h.side}<br>${h.why}</td><td class="${h.pnl>=0?'green':'red'}">${h.pnl>=0?'+':''}${num(h.pnl)}</td></tr>`).join('')+'</table>':'Chưa có giao dịch.';
+ document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{let p=state.positions.find(x=>String(x.id)===b.dataset.close);if(p)closePosition(p,'Đóng thủ công')});
+}
+$('toggleBot').onclick=()=>{state.bot=!state.bot;save();log(state.bot?'Đã bật BOT DEMO.':'Đã tắt BOT.');render();if(state.bot)scan()};
+$('stopAll').onclick=()=>{if(!confirm('Đóng toàn bộ vị thế mô phỏng?'))return;[...state.positions].forEach(p=>closePosition(p,'Đóng tất cả'))};
+render();refreshPrices();setInterval(refreshPrices,5000);setInterval(scan,60000);setTimeout(()=>{if(state.bot)scan()},2500);
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
